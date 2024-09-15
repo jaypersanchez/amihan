@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check Balances</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+        }
+        h1 {
+            text-align: center;
+            color: #007bff;
+        }
+        .balance {
+            margin: 20px 0;
+            padding: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Check Balances</h1>
+        <div id="results">
+            <div class="balance" id="amihan-balance">Amihan Balance: Loading...</div>
+            <div class="balance" id="ftm-balance">FTM Balance: Loading...</div>
+        </div>
+        <div id="error" class="error"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.0/dist/ethers.umd.min.js"></script>
+    <script>
+        async function main() {
+            try {
+                // Contract address and RPC URL
+                const contractAddress = '0xf1383d0aF1927BC1f4CE149933b09B33a12131f7'; // Replace with your contract address
+                const provider = new ethers.providers.JsonRpcProvider("https://rpc.ankr.com/fantom_testnet/");
+
+                // Replace with actual values
+                const walletAddress = '0x7e6C8567198ab3580bb8A655c089eFb2BE2d6CCc';
+                const privateKey = '102805fbc4ea95f77c0173da2af4e70966c79c4dcd24b5e4f6335a4323b91b1b';
+                const wallet = new ethers.Wallet(privateKey, provider);
+                const AmihanToken = new ethers.Contract(contractAddress, [
+                    "function balanceOf(address owner) view returns (uint256)"
+                ], wallet);
+
+                // Fetch balances
+                const balanceAddr1 = await AmihanToken.balanceOf(walletAddress);
+                const ftmBalanceAddr1 = await provider.getBalance(walletAddress);
+
+                // Display balances
+                document.getElementById('amihan-balance').innerText = `Amihan Balance: ${ethers.utils.formatUnits(balanceAddr1, 18)} AMIHAN`;
+                document.getElementById('ftm-balance').innerText = `FTM Balance: ${ethers.utils.formatUnits(ftmBalanceAddr1, 18)} FTM`;
+            } catch (error) {
+                document.getElementById('error').innerText = `Error: ${error.message}`;
+            }
+        }
+
+        main();
+    </script>
+</body>
+</html>
